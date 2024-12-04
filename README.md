@@ -66,3 +66,116 @@ sudo -i
 ●	И т.д.
 
 </details>
+
+**Создаём пользователя otusadm и otus:**   
+```
+useradd otusadm && sudo useradd otus
+```
+Создаём пользователям **otusadm** и **otus** пароли (создадим одинаковый пароль: **Otus2024#**)
+```
+passwd otusadm
+```
+вводим пароль: **Otus2024#**   
+```
+passwd otus
+```
+вводим пароль: **Otus2024#**   
+   
+Создадим группу **admin**:   
+```
+groupadd -f admin
+```  
+
+Добавляем пользователей **vagrant**, **root** и **otusadm** в группу **admin**:
+```
+usermod otusadm -a -G admin && usermod root -a -G admin && usermod vagrant -a -G admin
+```  
+
+Проверим что пользователям назначились группы:
+```
+id vagrant && id root && id otusadm
+```
+
+<details>
+<summary> результат выполнения команды: </summary>
+
+```
+uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant),1003(admin)
+uid=0(root) gid=0(root) groups=0(root),1003(admin)
+uid=1001(otusadm) gid=1001(otusadm) groups=1001(otusadm),1003(admin)
+```
+</details>
+   
+Попробуем зайти на хостовую машину под пользователем otus:
+```
+ssh otus@localhost
+```
+
+Если мы подключаемся первый раз, то на вопрос о сертификате необходимо ответить: yes
+```
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+```
+
+Проверим что мы зашли под пользователем otus:
+```
+whoami
+```
+
+Выйдем из сесии пользователя otus:
+```
+exit
+```
+
+Повторим действия для пользователя otusadm:
+```
+ssh otusadm@localhost   
+whoami
+exit
+```
+
+<details>
+<summary> результат выполнения команд: </summary>
+
+```
+root@pam:~# ssh otus@localhost
+The authenticity of host 'localhost (::1)' can't be established.
+ED25519 key fingerprint is SHA256:ncgV5CcHot4QFN/6rwIVymPudAdhNbFGrlb8lkUjW9Y.
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:1: [hashed name]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'localhost' (ED25519) to the list of known hosts.
+otus@localhost's password:
+Linux pam 6.1.0-25-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.106-3 (2024-08-26) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Wed Dec  4 13:12:01 2024 from 192.168.57.10
+Could not chdir to home directory /home/otus: No such file or directory
+$ whoami
+otus
+$ exit
+Connection to localhost closed.
+root@pam:~# ssh otusadm@localhost
+otusadm@localhost's password:
+Linux pam 6.1.0-25-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.106-3 (2024-08-26) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Could not chdir to home directory /home/otusadm: No such file or directory
+$ whoami
+otusadm
+$ exit
+Connection to localhost closed.
+root@pam:~#
+
+```
+</details>
+
