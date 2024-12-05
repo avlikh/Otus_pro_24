@@ -202,7 +202,7 @@ if [ $(date +%a) = "Sat" ] || [ $(date +%a) = "Sun" ]; then
 fi   
 
    - Примечание: первое условие можно сделать альтернативным способом (используя awk):   
-if [ $(date | awk '{print $1}') = "Sat" ] || [ $(date | awk '{print $1}') = "Sun" ]; then
+`if [ $(date | awk '{print $1}') = "Sat" ] || [ $(date | awk '{print $1}') = "Sun" ]; then`
 
 ```
 cat > /usr/local/bin/login.sh <<EOF
