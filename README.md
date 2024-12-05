@@ -93,7 +93,7 @@ usermod otusadm -a -G admin && usermod root -a -G admin && usermod vagrant -a -G
 
 Проверим что пользователям назначились группы:
 ```
-id vagrant && id root && id otusadm
+id vagrant && id root && id otusadm && id otus
 ```
 
 <details>
@@ -103,6 +103,7 @@ id vagrant && id root && id otusadm
 uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant),1003(admin)
 uid=0(root) gid=0(root) groups=0(root),1003(admin)
 uid=1001(otusadm) gid=1001(otusadm) groups=1001(otusadm),1003(admin)
+uid=1002(otus) gid=1002(otus) groups=1002(otus)
 ```
 </details>
    
