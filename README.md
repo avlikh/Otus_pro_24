@@ -212,13 +212,17 @@ exit 0
 ```
 </details>
 
-   - Примечание: первое условие можно сделать альтернативным способом (используя awk):   
-`if [ $(date | awk '{print $1}') = "Sat" ] || [ $(date | awk '{print $1}') = "Sun" ]; then`   
+         
+<details>
+<summary> ●	 Примечание: первое условие можно сделать альтернативным способом (используя awk) </summary>
+
+`if [ $(date | awk '{print $1}') = "Sat" ] || [ $(date | awk '{print $1}') = "Sun" ]; then`
+</details>
 
    **Создадим скрипт:**
   
 ```
-cat > /usr/local/bin/login.sh <<EOF
+cat > /usr/local/bin/login.sh
 #!/bin/bash
 
   # Получаем текущий день недели (1 для понедельника, 7 для воскресенья)
@@ -239,8 +243,15 @@ user=$(whoami)
 echo "Сегодня $day_of_week день недели"
 echo "доступ разрешен"
 exit 0
-EOF
 ```
+Нажмите [**enter**], затем комбинацию клавиш [**ctrl+d**]    
+    
+Сделаем файл **/usr/local/bin/login.sh** исполняемым:
+
+```
+chmod +x /usr/local/bin/login.sh
+```
+
 Проверим текущую дату:
 `date`   
 Результат: `Fri Dec  6 13:01:28 UTC 2024`   
