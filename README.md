@@ -251,6 +251,34 @@ exit 0
 ```
 chmod +x /usr/local/bin/login.sh
 ```
+    
+Добавим в файл /etc/pam.d/sshd запуск нашего скрипта (на 5 строку)
+
+```
+sed -i 4i\ 'auth required pam_exec.so debug /usr/local/bin/login.sh' /etc/pam.d/sshd
+```
+
+Проверим, что вызов скрипта добавлен:
+
+```
+head /etc/pam.d/sshd 
+```
+<details>
+<summary> результат выполнения команды: </summary>
+
+```
+# PAM configuration for the Secure Shell service
+
+# Standard Un*x authentication.
+auth required pam_exec.so debug /usr/local/bin/login.sh
+@include common-auth
+
+# Disallow non-root logins when /etc/nologin exists.
+account    required     pam_nologin.so
+
+# Uncomment and edit /etc/security/access.conf if you need to set complex
+```
+</details>
 
 Проверим текущую дату:
 `date`   
@@ -258,3 +286,43 @@ chmod +x /usr/local/bin/login.sh
    - Примечание: Если у вас выходной день, то ничего делать не надо. В моем случае, меняем дату на выходной:
 `date -s "7 DEC 2024 13:03:00"`
 Результат: `Sat Dec  7 13:03:00 UTC 2024`
+    
+Попробуем зайти на хостовую машину под пользователем otus:
+```
+ssh otus@localhost
+```
+Видим что пользователю Otus в доступе отказано: `Permission denied, please try again.`
+
+Повторим действия для пользователя otusadm:
+```
+ssh otusadm@localhost   
+whoami
+exit
+```
+
+<details>
+<summary> результат выполнения команд: </summary>
+
+```
+root@pam:~# ssh otus@localhost
+The authenticity of host 'localhost (::1)' can't be established.
+ED25519 key fingerprint is SHA256:ncgV5CcHot4QFN/6rwIVymPudAdhNbFGrlb8lkUjW9Y.
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:1: [hashed name]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'localhost' (ED25519) to the list of known hosts.
+otus@localhost's password:
+Linux pam 6.1.0-25-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.106-3 (2024-08-26) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Wed Dec  4 13:12:01 2024 from 192.168.57.10
+Could not chdir to home directory /home/otus: No such file or directory
+$ whoami
+otus
+$ exit
+Connection to localhost closed.
