@@ -190,25 +190,20 @@ root@pam:~#
 
 ```
 #!/bin/bash
-
-  # Получаем текущий день недели (1 для понедельника, 7 для воскресенья)
-day_of_week=$(date +%u)
-  # Определим группу пользователей, которым разрешен вход по выходным:
-allowed_group=admin
-  # Получаем имя текущего пользователя
-user=$(whoami)
-  # Проверяем, суббота или воскресенье
-    if [ "$day_of_week" -eq 6 ] || [ "$day_of_week" -eq 7 ]; then
-     echo "Сегодня суббота или воскресенье"
-       # Проверяем, является ли пользователь членом группы allowed_group
-       if ! groups $user | grep -wq "$allowed_group" ; then
-           echo "Доступ пользователю $user запрещен на выходных"
-           exit 1
-       fi
+#Первое условие: если день недели суббота или воскресенье
+if [ $(date +%a) = "Sat" ] || [ $(date +%a) = "Sun" ]; then
+ #Второе условие: входит ли пользователь в группу admin
+ if getent group admin | grep -qw "$PAM_USER"; then
+        #Если пользователь входит в группу admin, то он может подключиться
+        exit 0
+      else
+        #Иначе ошибка (не сможет подключиться)
+        exit 1
     fi
-echo "Сегодня $day_of_week день недели"
-echo "доступ разрешен"
-exit 0 
+  else
+    #Если день не выходной, то подключиться может любой пользователь
+    exit 0
+fi 
 ```
 </details>
 
@@ -224,25 +219,20 @@ exit 0
 ```
 cat > /usr/local/bin/login.sh
 #!/bin/bash
-
-  # Получаем текущий день недели (1 для понедельника, 7 для воскресенья)
-day_of_week=$(date +%u)
-  # Определим группу пользователей, которым разрешен вход по выходным:
-allowed_group=admin
-  # Получаем имя текущего пользователя
-user=$(whoami)
-  # Проверяем, суббота или воскресенье
-    if [ "$day_of_week" -eq 6 ] || [ "$day_of_week" -eq 7 ]; then
-     echo "Сегодня суббота или воскресенье"
-       # Проверяем, является ли пользователь членом группы allowed_group
-       if ! groups $user | grep -wq "$allowed_group" ; then
-           echo "Доступ пользователю $user запрещен на выходных"
-           exit 1
-       fi
+#Первое условие: если день недели суббота или воскресенье
+if [ $(date +%a) = "Sat" ] || [ $(date +%a) = "Sun" ]; then
+ #Второе условие: входит ли пользователь в группу admin
+ if getent group admin | grep -qw "$PAM_USER"; then
+        #Если пользователь входит в группу admin, то он может подключиться
+        exit 0
+      else
+        #Иначе ошибка (не сможет подключиться)
+        exit 1
     fi
-echo "Сегодня $day_of_week день недели"
-echo "доступ разрешен"
-exit 0
+  else
+    #Если день не выходной, то подключиться может любой пользователь
+    exit 0
+fi
 ```
 Нажмите [**enter**], затем комбинацию клавиш [**ctrl+d**]    
     
@@ -255,7 +245,7 @@ chmod +x /usr/local/bin/login.sh
 Добавим в файл /etc/pam.d/sshd запуск нашего скрипта (на 5 строку)
 
 ```
-sed -i 4i\ 'auth required pam_exec.so debug /usr/local/bin/login.sh' /etc/pam.d/sshd
+sed -i 5i\ 'auth required pam_exec.so debug /usr/local/bin/login.sh' /etc/pam.d/sshd
 ```
 
 Проверим, что вызов скрипта добавлен:
@@ -291,7 +281,7 @@ account    required     pam_nologin.so
 ```
 ssh otus@localhost
 ```
-Видим что пользователю Otus в доступе отказано: `Permission denied, please try again.`
+Видим что пользователю **otus** в доступе **отказано**: `Permission denied (publickey,password)`
 
 Повторим действия для пользователя otusadm:
 ```
@@ -304,14 +294,8 @@ exit
 <summary> результат выполнения команд: </summary>
 
 ```
-root@pam:~# ssh otus@localhost
-The authenticity of host 'localhost (::1)' can't be established.
-ED25519 key fingerprint is SHA256:ncgV5CcHot4QFN/6rwIVymPudAdhNbFGrlb8lkUjW9Y.
-This host key is known by the following other names/addresses:
-    ~/.ssh/known_hosts:1: [hashed name]
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added 'localhost' (ED25519) to the list of known hosts.
-otus@localhost's password:
+root@pam:~# ssh otusadm@localhost
+otusadm@localhost's password:
 Linux pam 6.1.0-25-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.106-3 (2024-08-26) x86_64
 
 The programs included with the Debian GNU/Linux system are free software;
@@ -320,9 +304,12 @@ individual files in /usr/share/doc/*/copyright.
 
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
-Last login: Wed Dec  4 13:12:01 2024 from 192.168.57.10
-Could not chdir to home directory /home/otus: No such file or directory
+Last login: Sat Dec  7 13:08:15 2024 from ::1
+Could not chdir to home directory /home/otusadm: No such file or directory
 $ whoami
-otus
+otusadm
 $ exit
 Connection to localhost closed.
+```
+</details>
+Видим что пользователю **otusadm** доступ **разрешен**.   
