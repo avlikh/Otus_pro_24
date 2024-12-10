@@ -282,7 +282,7 @@ ssh otus@localhost
 ```
 Видим что пользователю **otus** в доступе **отказано**: `Permission denied (publickey,password)`
 
-Повторим действия для пользователя otusadm:
+Повторим действия для пользователя **otusadm**:
 ```
 ssh otusadm@localhost   
 whoami
