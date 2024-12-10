@@ -260,8 +260,8 @@ head /etc/pam.d/sshd
 # PAM configuration for the Secure Shell service
 
 # Standard Un*x authentication.
-auth required pam_exec.so debug /usr/local/bin/login.sh
 @include common-auth
+auth required pam_exec.so debug /usr/local/bin/login.sh
 
 # Disallow non-root logins when /etc/nologin exists.
 account    required     pam_nologin.so
